@@ -30,4 +30,4 @@ jobs:
         run: npm audit --audit-level=moderate || true
 
       - name: Show demo message
-        run: echo "Demo: Frontend CI ran on push to main!"
+        run: echo "Demo Frontend CI ran on push to main!"
