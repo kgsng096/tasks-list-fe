@@ -1,3 +1,5 @@
+import { clearCsrfTokenCache } from "./getCsrfToken";
+
 export function logout() {
   document.cookie.split(";").forEach((c) => {
     document.cookie = c
@@ -7,4 +9,5 @@ export function logout() {
 
   localStorage.clear();
   sessionStorage.clear();
+  clearCsrfTokenCache();
 }

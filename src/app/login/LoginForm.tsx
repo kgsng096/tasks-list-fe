@@ -4,6 +4,8 @@ import * as React from "react";
 import { TextField, Button, Alert } from "@mui/material";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { fetchCsrfToken } from "@/store/csrfSlice";
 
 interface LoginFormProps {
   onSuccess: () => void;
@@ -11,6 +13,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ onSuccess }: LoginFormProps) {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
@@ -31,9 +34,21 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       const data = await res.json();
 
       if (res.ok && data.accessToken) {
-        Cookies.set("accessToken", data.accessToken, { secure: true, sameSite: "strict" });
+        Cookies.set("accessToken", data.accessToken, {
+          secure: true,
+          sameSite: "strict",
+        });
+        if (data.user) {
+          Cookies.set("user", JSON.stringify(data.user), {
+            secure: true,
+            sameSite: "strict",
+          });
+        }
         setError(null);
-        router.push("/dashboard"); // Redirect here
+
+        await dispatch(fetchCsrfToken());
+
+        router.push("/dashboard");
       } else {
         setError(data.message || "Login failed");
       }

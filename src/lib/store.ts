@@ -1,8 +1,10 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import tasksReducer from "@/store/taskSlice"; // adjust path if needed
+import tasksReducer from "@/store/taskSlice";
+import csrfReducer from "@/store/csrfSlice";
 
 const rootReducer = combineReducers({
-  tasks: tasksReducer, // Make sure this is a reducer function
+  tasks: tasksReducer,
+  csrf: csrfReducer,
 });
 
 export function makeStore() {
