@@ -7,7 +7,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "./Sidebar";
 import TaskList from "./TaskList";
 import CreateTaskFab from "./CreateTaskFab";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch } from "@/store/hooks";
+import { useSelector } from "react-redux";
 import { authFetch } from "@/utils/authFetch";
 import { fetchTasks } from "@/store/taskSlice";
 
@@ -26,7 +27,7 @@ const {
 const drawerWidth = 240;
 
 export default function DashboardPage() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const status = useSelector((state: any) => state.tasks.status);
   const error = useSelector((state: any) => state.tasks.error);
   const csrfToken = useSelector((state: any) => state.csrf.token);
@@ -190,7 +191,6 @@ export default function DashboardPage() {
               <TaskList
                 tasks={tasks}
                 locale={userLocale}
-                onTasksChanged={fetchData}
                 onUpdateTask={updateTask}
                 onDeleteTask={deleteTask}
               />
@@ -199,7 +199,6 @@ export default function DashboardPage() {
               <TaskList
                 tasks={tasks}
                 locale={userLocale}
-                onTasksChanged={fetchData}
                 onUpdateTask={updateTask}
                 onDeleteTask={deleteTask}
               />

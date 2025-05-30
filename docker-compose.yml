@@ -1,0 +1,10 @@
+services:
+  frontend:
+    build: .
+    image: exampleregistry/exampleregistries/frontend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_HOST=http://localhost:5000
+    restart: unless-stopped

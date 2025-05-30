@@ -4,7 +4,7 @@ import * as React from "react";
 import { TextField, Button, Alert } from "@mui/material";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "@/store/hooks";
 import { fetchCsrfToken } from "@/store/csrfSlice";
 
 interface LoginFormProps {
@@ -13,7 +13,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ onSuccess }: LoginFormProps) {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);

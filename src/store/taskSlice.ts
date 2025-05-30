@@ -73,13 +73,26 @@ export const updateTask = createAsyncThunk(
   }
 );
 
+type Task = {
+  id: string;
+  name: string;
+};
+
+interface TasksState {
+  tasks: Task[];
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
+}
+
+const initialState: TasksState = {
+  tasks: [],
+  status: "idle",
+  error: null,
+};
+
 const taskSlice = createSlice({
   name: "tasks",
-  initialState: {
-    tasks: [],
-    status: "idle",
-    error: null,
-  },
+  initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -92,10 +105,10 @@ const taskSlice = createSlice({
       })
       .addCase(fetchTasks.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message;
+        state.error = action.error.message ?? null;
       })
       .addCase(createTask.rejected, (state, action) => {
-        state.error = action.error.message;
+        state.error = action.error.message ?? null;
       })
       .addCase(updateTask.fulfilled, (state, action) => {
         const idx = state.tasks.findIndex((t) => t.id === action.payload.id);
