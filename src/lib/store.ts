@@ -1,11 +1,15 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import tasksReducer from "@/store/taskSlice"; // adjust path if needed
 
-export const makeStore = () => {
+const rootReducer = combineReducers({
+  tasks: tasksReducer, // Make sure this is a reducer function
+});
+
+export function makeStore() {
   return configureStore({
-    reducer: {},
+    reducer: rootReducer,
   });
-};
+}
 
 export type AppStore = ReturnType<typeof makeStore>;
-export type RootState = ReturnType<AppStore["getState"]>;
-export type AppDispatch = AppStore["dispatch"];
+export type AppState = ReturnType<typeof rootReducer>;

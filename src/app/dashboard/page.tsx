@@ -1,7 +1,15 @@
 "use client";
 
-import * as React from "react";
-import {
+import React, { useEffect } from "react";
+import Cookies from "js-cookie";
+import * as Mui from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import Sidebar from "./Sidebar";
+import TaskList from "./TaskList";
+import { useDispatch, useSelector } from "react-redux";
+import { authFetch } from "@/utils/authFetch";
+
+const {
   AppBar,
   Toolbar,
   IconButton,
@@ -11,22 +19,59 @@ import {
   Paper,
   Tabs,
   Tab,
-} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import Sidebar from "./Sidebar";
-import TaskList, { Task } from "./TaskList";
+} = Mui;
 
 const drawerWidth = 240;
 
-const tasks: Task[] = [
-  { id: 1, title: "Task One", description: "First task description" },
-  { id: 2, title: "Task Two", description: "Second task description" },
-  { id: 3, title: "Task Three", description: "Third task description" },
-];
-
 export default function DashboardPage() {
-  const [open, setOpen] = React.useState(true);
+  const dispatch = useDispatch();
+  const status = useSelector((state: any) => state.tasks.status);
+  const error = useSelector((state: any) => state.tasks.error);
+  const [tasks, setTasks] = React.useState([]);
+  const [open, setOpen] = React.useState(false);
   const [tab, setTab] = React.useState(0);
+  const [userRole, setUserRole] = React.useState<number | null>(null);
+
+  // Check for credentials on mount
+  useEffect(() => {
+    const accessToken = Cookies.get("accessToken");
+    if (!accessToken) {
+      window.location.href = "/login";
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      let url =
+        tab === 0
+          ? `${process.env.NEXT_PUBLIC_API_HOST}/api/users/my-tasks`
+          : `${process.env.NEXT_PUBLIC_API_HOST}/api/tasks`;
+      const res = await authFetch(url);
+      // If unauthorized, redirect to login
+      if (res.status === 401 || res.status === 403) {
+        window.location.href = "/login";
+        return;
+      }
+      const data = await res.json();
+      if (tab === 0 && data.result && Array.isArray(data.result.tasks)) {
+        setTasks(
+          data.result.tasks.map((task: any) => ({
+            ...task,
+            updatedAt: task.updatedAt || new Date().toISOString(),
+          }))
+        );
+        setUserRole(data.result.role?.id ?? null);
+      } else if (tab === 1 && Array.isArray(data)) {
+        setTasks(data);
+      } else {
+        setTasks([]);
+      }
+    };
+    fetchData();
+  }, [tab]);
+
+  const userLocale =
+    typeof window !== "undefined" ? navigator.language : "en-US";
 
   return (
     <Box
@@ -45,42 +90,44 @@ export default function DashboardPage() {
         }}
       >
         <Toolbar>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Tasks Management
-          </Typography>
+          {/* Burger button on the left */}
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            edge="end"
+            edge="start"
             onClick={() => setOpen(!open)}
-            sx={{ ml: 2 }}
+            sx={{ mr: 2 }}
           >
             <MenuIcon />
           </IconButton>
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+            Tasks Management
+          </Typography>
         </Toolbar>
       </AppBar>
-      {/* Sidebar on the right */}
-      <Sidebar open={open} anchor="right" />
+      <Sidebar open={open} anchor="left" />
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: { xs: 2, sm: 3 },
-          width: { sm: `calc(100% - ${open ? drawerWidth : 0}px)` },
           transition: "margin .3s",
-          marginRight: { lg: open ? `${drawerWidth}px` : 0 },
+          marginLeft: open ? `${drawerWidth}px` : 0,
         }}
       >
         <Toolbar />
         <Paper
           elevation={4}
           sx={{
-            maxWidth: 900,
+            width: "100%",
+            maxWidth: open ? 700 : 1100,
+            minWidth: 320,
             mx: "auto",
             p: { xs: 2, sm: 4 },
             borderRadius: 4,
             boxShadow: 3,
             background: "rgba(255,255,255,0.95)",
+            transition: "max-width .3s",
           }}
         >
           <Tabs
@@ -99,10 +146,13 @@ export default function DashboardPage() {
             }}
           >
             <Tab label="My Tasks" />
-            <Tab label="All Tasks" />
+            {userRole === 1 && <Tab label="All Tasks" />}
           </Tabs>
           <Box className="mt-4">
-            <TaskList tasks={tasks} />
+            {tab === 0 && <TaskList tasks={tasks} locale={userLocale} />}
+            {tab === 1 && userRole === 1 && (
+              <TaskList tasks={tasks} locale={userLocale} />
+            )}
           </Box>
         </Paper>
       </Box>

@@ -52,7 +52,7 @@ export default function Sidebar({
         }}
       >
         <List sx={{ flex: 1 }}>
-          <ListItem button component={Link} href="/profile">
+          <ListItem component={Link} href="/profile">
             <ListItemIcon sx={{ color: "#fff", minWidth: 36 }}>
               <BadgeOutlinedIcon />
             </ListItemIcon>
@@ -62,7 +62,7 @@ export default function Sidebar({
         <Box>
           <Divider sx={{ bgcolor: "#374151" }} />
           <List>
-            <ListItem button component={Link} href="/logout">
+            <ListItem component={Link} href="/logout">
               <ListItemIcon sx={{ color: "#fff", minWidth: 36 }}>
                 <LogoutRoundedIcon />
               </ListItemIcon>
