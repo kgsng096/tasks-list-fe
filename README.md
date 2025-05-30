@@ -1,4 +1,4 @@
-# Globe Take-Home Frontend
+# Task Lists Frontend
 
 This is a [Next.js](https://nextjs.org) frontend project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
