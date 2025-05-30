@@ -1,12 +1,14 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Cookies from "js-cookie";
-import { Paper, Typography, Box, Divider } from "@mui/material";
+import { Paper, Typography, Box, Divider, CircularProgress } from "@mui/material";
 import { useRoles } from "@/hooks/useRoles";
-import ProfileHeader from "./ProfileHeader";
-import ProfileDetails from "./ProfileDetails";
-import LoadingScreen from "../components/LoadingScreen";
+
+// Lazy load components
+const ProfileHeader = React.lazy(() => import("./ProfileHeader"));
+const ProfileDetails = React.lazy(() => import("./ProfileDetails"));
+const LoadingScreen = React.lazy(() => import("../components/LoadingScreen"));
 
 export default function ProfilePage() {
   const { roles, loading } = useRoles(true);
@@ -27,7 +29,22 @@ export default function ProfilePage() {
   }
 
   if (loading) {
-    return <LoadingScreen message="Loading your profile..." />;
+    return (
+      <Suspense
+        fallback={
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="60vh"
+          >
+            <CircularProgress />
+          </Box>
+        }
+      >
+        <LoadingScreen message="Loading your profile..." />
+      </Suspense>
+    );
   }
 
   // Find the role name from the roles array
@@ -53,9 +70,25 @@ export default function ProfilePage() {
           overflow: "hidden",
         }}
       >
-        <ProfileHeader user={user} />
+        <Suspense
+          fallback={
+            <Box py={6} textAlign="center">
+              <CircularProgress />
+            </Box>
+          }
+        >
+          <ProfileHeader user={user} />
+        </Suspense>
         <Divider />
-        <ProfileDetails roleName={roleName} />
+        <Suspense
+          fallback={
+            <Box py={6} textAlign="center">
+              <CircularProgress />
+            </Box>
+          }
+        >
+          <ProfileDetails roleName={roleName} />
+        </Suspense>
       </Paper>
     </Box>
   );
