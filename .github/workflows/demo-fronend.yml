@@ -1,0 +1,33 @@
+name: Demo Frontend CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linter
+        run: npm run lint || echo "No linter configured"
+
+      - name: Run tests
+        run: npm test || echo "No tests configured"
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=moderate || true
+
+      - name: Show demo message
+        run: echo "Demo: Frontend CI ran on push to main!"
